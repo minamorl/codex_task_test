@@ -5,24 +5,20 @@ on:
   pull_request:
 
 jobs:
-  lint-test:
+  tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: ruff check src tests
-      - run: mypy src
-      - run: pytest -q
-
-  benchmark:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run CI
+        run: make ci
+      - name: Upload benchmark
+        if: ${{ hashFiles('out/bench.json') != '' }}
+        uses: actions/upload-artifact@v3
         with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: pytest -q tests/test_bench.py --benchmark-only
+          name: bench
+          path: out/bench.json

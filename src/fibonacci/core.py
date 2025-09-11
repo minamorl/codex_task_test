@@ -6,6 +6,7 @@ from typing import Callable
 
 
 def _ensure_int(n: int) -> None:
+    """Ensure ``n`` is an integer."""
     if not isinstance(n, int):
         raise TypeError("n must be an int")
 
@@ -63,6 +64,7 @@ def fib_fast_doubling(n: int) -> int:
 
 @lru_cache(maxsize=None)
 def _fib_pair(n: int) -> tuple[int, int]:
+    """Return ``(F(n), F(n+1))`` using fast doubling."""
     if n == 0:
         return (0, 1)
     a, b = _fib_pair(n // 2)
@@ -103,9 +105,21 @@ _METHODS: dict[str, Callable[[int], int]] = {
 
 
 def fib_range(start: int, stop: int, method: str = "fast") -> list[int]:
-    """Return Fibonacci numbers for the inclusive range [start, stop]."""
+    """Return Fibonacci numbers for the inclusive range ``[start, stop]``.
+
+    Parameters
+    ----------
+    start: int
+        Starting index (must be >= 0).
+    stop: int
+        Ending index (must be >= ``start``).
+    method: str, optional
+        One of ``{"recursive", "iterative", "fast", "memo"}``.
+    """
     _ensure_int(start)
     _ensure_int(stop)
+    if not isinstance(method, str):
+        raise TypeError("method must be a str")
     if start < 0 or stop < 0 or start > stop:
         raise ValueError("invalid range")
     func = _METHODS.get(method)
